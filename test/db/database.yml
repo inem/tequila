@@ -1,0 +1,3 @@
+demo:
+  adapter: sqlite3
+  database: demo.sqlite3

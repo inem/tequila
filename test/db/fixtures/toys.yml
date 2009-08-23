@@ -1,0 +1,12 @@
+lhc:
+  label: LHC
+  price: 1000000.0 
+hum:
+  label: Humanity
+  price: 10
+con:
+  label: continents
+  price: 1000
+grz:
+  label: gravizapa
+  price: 9999

@@ -1,0 +1,186 @@
+grammar Tequila
+
+  rule program
+    space expression space {
+      def eval(binding)
+        tree = Tequila::Tree.new
+	expression.eval(tree, tree.root, binding)
+      end
+    }
+  end
+
+  rule expression
+    '-' var_type:('@'/'@@'/'$')? object {
+      def eval(tree, parent, binding)
+        object.eval(tree, parent, binding, :variable, {:var_type => var_type.text_value})
+      end
+    }
+  end
+
+  rule object
+    term label:( space '=>' space term)? atd:attributes_decl? mtd:methods_decl? cbd:code_decl* asd:association_decl* gld:gluing_decl* eob {
+
+      def name
+        elements[0].text_value
+      end
+
+      def eval(tree, parent, binding, type, params ={})
+
+	node = Tequila::Node.new((:variable == type) ? params[:var_type] + name : name, type).eval(binding)
+
+	if label.elements
+	  node.label = label.term.text_value
+	end
+
+	if atd.elements
+          atd.update_node(node)
+	end
+
+	if mtd.elements
+          mtd.update_node(node)
+	end
+
+	if cbd.elements
+	  cbd.elements.each {|cb| cb.update_node(node)}
+	end
+
+        tree.add_child_to(parent, node)
+
+	asd.elements.each {|e| e.eval(tree, node, binding) }
+	gld.elements.each {|e| e.eval(tree, node, binding) }
+
+        tree
+      end
+    }
+  end
+
+  rule association_decl
+    space '+' object {
+      def eval(tree, node, binding)
+        object.eval(tree, node, binding, :association)
+      end
+    }
+  end
+
+  rule gluing_decl
+    space '<' object {
+      def eval(tree, node, binding)
+        object.eval(tree, node, binding, :bounded)
+      end
+    }
+  end
+
+  rule attributes_decl
+    space ':' (only_attributes_decl / except_attributes_decl) {
+      def update_node(node)
+        elements[2].update_node(node)
+      end
+    }
+  end
+
+  rule only_attributes_decl
+    'only' atd:(only_attribute_decl)+ {
+      def update_node(node)
+        atd.elements.each {|x| x.update_node(node, :only)}
+      end
+    }
+  end
+
+  rule except_attributes_decl
+    'except' atd:(except_attribute_decl)+ {
+      def update_node(node)
+        atd.elements.each {|x| x.update_node(node, :except)}
+      end
+    }
+  end
+
+  rule only_attribute_decl
+    space '.' term label:( space '=>' space term)? {
+      def update_node(node, key)
+        m = Tequila::Node::Attribute.new(term.text_value)
+	if label.elements
+          m.label = label.term.text_value
+	end
+	node.add_attribute(key, m)
+      end
+    }
+  end
+
+  rule except_attribute_decl
+    space '.' term {
+      def update_node(node, key)
+        m = Tequila::Node::Attribute.new(term.text_value)
+	node.add_attribute(key, m)
+      end
+    }
+  end
+
+  rule attribute_decl
+    space '.' term label:( space '=>' space term)? {
+      def update_node(node, key)
+        m = Tequila::Node::Attribute.new(term.text_value)
+	if label.elements
+          m.label = label.term.text_value
+	end
+	node.add_attribute(key, m)
+      end
+    }
+  end
+
+  rule methods_decl
+    space ':methods' mtd:(method_decl)+ {
+      def update_node(node)
+        mtd.elements.each {|x| x.update_node(node)}
+      end
+    }
+  end
+
+  rule method_decl
+    space '.' term params:('(' space first_param:(!(','/')') .)+ space rest_params:(',' space param:(!(','/')') .)+ space)* ')')? label:( space '=>' space term)? {
+      def update_node(node)
+        m = Tequila::Node::Method.new(term.text_value)
+
+	if params.elements
+	  m.params = parameters
+	end
+
+	if label.elements
+          m.label = label.term.text_value
+	end
+	node.methods += [m]
+      end
+
+      def parameters
+        [params.first_param.text_value] + params.rest_params.elements.map{|p| p.param.text_value}
+      end
+
+    }
+  end
+
+  rule code_decl
+    space ':code' label:( space '=>' space term) code:(!eob . )* code_end {
+      def update_node(node)
+        node.code_blocks += [Tequila::Node::CodeBlock.new(label.term.text_value, code.text_value)]
+      end
+    }
+  end
+
+  rule code_end
+    eob
+  end
+
+  rule eob #end of block
+    space 'end'
+  end
+
+  rule term
+    [a-zA-Z0-9_\?\!]+
+  end
+
+  rule space
+    [ \n]*
+  end
+
+end
+
+
