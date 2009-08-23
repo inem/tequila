@@ -2,6 +2,7 @@
 
 require 'treetop'
 require 'tequila'
+require 'preprocessor'
 require 'tree'
 
 class TequilaJazzHandler < ActionView::TemplateHandler
