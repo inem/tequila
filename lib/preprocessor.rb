@@ -2,7 +2,12 @@ module TequilaPreprocessor
   EOB = "end\n".freeze
   EOC = "end\n".freeze
   JAZZ = ".jazz".freeze
-  def TequilaPreprocessor.run(source, offset = -1)
+  
+  def TequilaPreprocessor.run(source)
+    rrun(source)[0]
+  end
+
+  def TequilaPreprocessor.rrun(source, offset = -1)
     prev = offset
     text = ""
     code = nil
@@ -21,13 +26,14 @@ module TequilaPreprocessor
         end
       end
       case rest
-#      when /^&(\w+)/
-#        begin
-#          text += run(include_file('_' + $1 + JAZZ, tabs), tabs)
-#        rescue Errno::ENOENT => e
-#          p e
-#        end
-#        next
+      when /^&(\w+)/
+        begin
+          txt, tbs = rrun(include_file('_' + $1 + JAZZ, tabs), tabs)
+          text += txt
+        rescue Errno::ENOENT => e
+          p e
+        end
+        next
       when /^:code/
         code = tabs
       when /^(\+|\-|\<)/
@@ -39,8 +45,8 @@ module TequilaPreprocessor
       text += "#{line}\n"
     end
     text += EOC if code
-    (prev - offset).times { text += EOB }
-    text
+    #(prev - offset).times { text += EOB }
+    [text, prev - offset]
   end
 private
   def TequilaPreprocessor.include_file(filename, offset)
