@@ -196,4 +196,24 @@ END
               "whois" : "dog" }  } ] } }'
     run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
   end
+####  include files ####
+  def test_include_file
+    jazz = <<END
+-human
+  :only
+    .name
+  &test/pets
+END
+    jazz_for_treetop = <<END
+-human
+  :only
+    .name
+  +pets
+    :only
+      .id
+end
+end
+END
+    assert_equal TequilaPreprocessor.run(jazz), jazz_for_treetop
+  end
 end
