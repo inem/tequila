@@ -1,5 +1,9 @@
-TODO:
+BUGS:
+  - returns {"@runs":[{"@run":{...}]} instead of 
   - handle situation when has_one association is nil, e.g. it simply should return nothing instead of giving the error
+TODO:
+  - option to avoid rails noise {"runs":[{"run":{"id":"1", ...}}]} 
+    Make it propuce {"runs":[{"id":1}]} instead
   - gluing for mas_many associations
   - comments //
   - :plain (some symbol for this?)
