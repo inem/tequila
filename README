@@ -1,4 +1,5 @@
 TODO:
+  - handle situation when has_one association is nil, e.g. it simply should return nothing instead of giving the error
   - gluing for mas_many associations
   - comments //
   - :plain (some symbol for this?)
