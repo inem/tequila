@@ -45,7 +45,7 @@ module Tequila
             if n.bounded?
               out.merge(build_hash_with_context(n, n.content.call(context)).values.first)
             else
-              out.merge(build_hash_with_context(n, n.content.call(context)))
+              out.merge(build_hash_with_context(n, n.content.call(context)))  rescue {}
             end
           end)
         }.merge(bounded_nodes)
