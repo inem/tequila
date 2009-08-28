@@ -43,7 +43,7 @@ module Tequila
           node.apply(context).merge(
           @tree[node].inject({}) do |out, n|
             if n.bounded?
-              out.merge(build_hash_with_context(n, n.content.call(context)).values.first)
+              out.merge(build_hash_with_context(n, n.content.call(context)).values.first) rescue {}
             else
               out.merge(build_hash_with_context(n, n.content.call(context)))  rescue {}
             end
