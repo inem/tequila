@@ -37,15 +37,17 @@ module Tequila
             build_hash_with_context(node, elementary_context)
           end
         }
+      elsif context.nil?
+        {}
       elsif @tree[node]
         bounded_nodes = {}
-        { node.label.singularize => 
+        { node.label.singularize =>
           node.apply(context).merge(
           @tree[node].inject({}) do |out, n|
             if n.bounded?
-              out.merge(build_hash_with_context(n, n.content.call(context)).values.first) rescue {}
+              out.merge(build_hash_with_context(n, n.content.call(context)).values.first)
             else
-              out.merge(build_hash_with_context(n, n.content.call(context)))  rescue {}
+              out.merge(build_hash_with_context(n, n.content.call(context)))
             end
           end)
         }.merge(bounded_nodes)
@@ -132,7 +134,7 @@ module Tequila
 
     def initialize(name, type, bounded = false)
       @name = name
-      @label = @name
+      @label = @name.gsub(/[@\$]/,'')
       @type = type
       @methods = []
       @attributes = { :only => [], :except => []}
@@ -158,6 +160,7 @@ module Tequila
       elsif attributes[:except].size > 0
         context.attributes.delete_if {|(k,v)| attributes[:except].map(&:name).include?(k)}
       else
+        # use all variables by default
         context.attributes
       end.merge(
         (methods || []).inject({}) do |res, m|

@@ -1,10 +1,7 @@
 BUGS:
-  - returns {"@runs":[{"@run":{...}]} instead of {"runs":[{"run":{...}]}
-  - [TEST] handle situation when has_one association is nil, e.g. it simply should return nothing instead of giving the error
-  - should return [] for has_many associations if there is blank array.
 TODO:
   - option to generate keys without quotes
-  - option to avoid rails noise {"runs":[{"run":{"id":"1", ...}}]} 
+  - option to avoid rails noise {"runs":[{"run":{"id":"1", ...}}]}
     Make it propuce {"runs":[{"id":1}]} instead
   - gluing for mas_many associations
   - comments //
@@ -17,4 +14,4 @@ TODO:
       .bbb
   -  :plain by default
   -  define :all by symbol
-  
+
