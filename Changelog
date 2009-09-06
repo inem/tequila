@@ -1,4 +1,4 @@
 2009-09-06 Eugene Hlyzov  <hlyzov@gmail.com>
 	fix bug with nil association
 	fix bug with wrong label
-	cover known bugs with tests
+	add tests for fixed bugs
