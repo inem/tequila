@@ -257,5 +257,15 @@ END
     @pet.destroy
   end
 
+  def test_suppress_label
+    jazz = <<END
+-humans~
+  :only
+    .name
+END
+    json = '{ "humans" : [ {"name":"Alex"} ,{"name":"Eugene"}, {"name":"Ivan"}, {"name":"Oleg"} ] }'
+    run_test jazz, json
+  end
+
 
 end
