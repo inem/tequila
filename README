@@ -1,8 +1,6 @@
 BUGS:
 TODO:
   - option to generate keys without quotes
-  - option to avoid rails noise {"runs":[{"run":{"id":"1", ...}}]}
-    Make it propuce {"runs":[{"id":1}]} instead
   - gluing for mas_many associations
   - comments //
   - :plain (some symbol for this?)
