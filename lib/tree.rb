@@ -38,21 +38,26 @@ module Tequila
           end
         }
       elsif @tree[node]
-        bounded_nodes = {}
-        { node.label.singularize => 
-          node.apply(context).merge(
+        node_value = node.apply(context).merge(
           @tree[node].inject({}) do |out, n|
-            if n.bounded?
-              out.merge(build_hash_with_context(n, n.content.call(context)).values.first) rescue {}
+            new_context = n.content.call(context)
+            if new_context.nil?
+              out
             else
-              out.merge(build_hash_with_context(n, n.content.call(context)))  rescue {}
+              if n.bounded?
+                out.merge(build_hash_with_context(n, new_context).values.first)
+              else
+                out.merge(build_hash_with_context(n, new_context))
+              end
             end
           end)
-        }.merge(bounded_nodes)
+        node.suppress_label ?
+          node_value :
+          { node.label.singularize => node_value }
       else
-        { node.label.singularize =>
-          node.apply(context)
-        }
+        node.suppress_label ?
+          node.apply(context) :
+          { node.label.singularize => node.apply(context) }
       end
     end
 
@@ -72,6 +77,7 @@ module Tequila
     attr_accessor :attributes
     attr_accessor :code_blocks
     attr_accessor :label
+    attr_accessor :suppress_label
     attr_reader :name
     attr_reader :content
     attr_reader :type
@@ -132,11 +138,12 @@ module Tequila
 
     def initialize(name, type, bounded = false)
       @name = name
-      @label = @name
+      @label = @name.gsub(/[@\$]/,'')
       @type = type
       @methods = []
       @attributes = { :only => [], :except => []}
       @code_blocks = []
+      @suppress_label = false
     end
 
     def eval(vars)
@@ -158,6 +165,7 @@ module Tequila
       elsif attributes[:except].size > 0
         context.attributes.delete_if {|(k,v)| attributes[:except].map(&:name).include?(k)}
       else
+        # use all variables by default
         context.attributes
       end.merge(
         (methods || []).inject({}) do |res, m|

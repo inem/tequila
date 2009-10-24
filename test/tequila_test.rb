@@ -51,7 +51,7 @@ END
         [ {"pet" :
           { "name" : "Poiyo",
             "which": "Poiyo is wet and cold",
-            "toys" : 
+            "toys" :
             [ { "toy" : { "label" : "LHC" } },
               { "toy" : { "label" : "Humanity" } } ],
             "pet_type" : "fish"}}
@@ -168,7 +168,7 @@ END
       "ivan" :
         { "name" : "Ivan",
           "pets" : [
-          { "pet" : 
+          { "pet" :
             { "name" : "Skooby Doo" ,
               "pet_type":
               { "whois" : "dog" } }  } ] } }'
@@ -191,7 +191,7 @@ END
       "ivan" :
         { "name" : "Ivan",
           "pets" : [
-          { "pet" : 
+          { "pet" :
             { "name" : "Skooby Doo" ,
               "whois" : "dog" }  } ] } }'
     run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
@@ -216,4 +216,56 @@ end
 END
     assert_equal TequilaPreprocessor.run(jazz), jazz_for_treetop
   end
+
+  def test_label_building
+    jazz =<<END
+-@eugene
+  :only
+    .name
+END
+    json = %q{{"eugene" :  { "name" : "Eugene" }}}
+    run_test jazz, json, '@eugene = Human.find_by_name "Eugene"'
+  end
+
+  def test_has_many_empty_associan
+    jazz =<<END
+-josh
+  :only
+    .name
+  +pets
+    :only
+      .name
+END
+    @josh = Human.create({:name => 'Josh'})
+    json = %q{{"josh" :  { "name" : "Josh", "pets" : [] }}}
+    run_test jazz, json, 'josh = Human.find_by_name "Josh"'
+    @josh.destroy
+  end
+
+  def test_nil_association
+    jazz =<<END
+-pet
+  :only
+    .name
+  +human
+    :only
+      .name
+END
+    @pet = Pet.create({:name => 'Godzilla'})
+    json = %q{{"pet" :  { "name" : "Godzilla"}}}
+    run_test jazz, json, 'pet = Pet.find_by_name "Godzilla"'
+    @pet.destroy
+  end
+
+  def test_suppress_label
+    jazz = <<END
+-humans~
+  :only
+    .name
+END
+    json = '{ "humans" : [ {"name":"Alex"} ,{"name":"Eugene"}, {"name":"Ivan"}, {"name":"Oleg"} ] }'
+    run_test jazz, json
+  end
+
+
 end

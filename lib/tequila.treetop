@@ -18,7 +18,7 @@ grammar Tequila
   end
 
   rule object
-    term label:( space '=>' space term)? atd:attributes_decl? mtd:methods_decl? cbd:code_decl* asd:association_decl* gld:gluing_decl* eob {
+    term suppress_label:'~'? label:( space '=>' space term)? atd:attributes_decl? mtd:methods_decl? cbd:code_decl* asd:association_decl* gld:gluing_decl* eob {
 
       def name
         elements[0].text_value
@@ -27,6 +27,10 @@ grammar Tequila
       def eval(tree, parent, binding, type, params ={})
 
 	node = Tequila::Node.new((:variable == type) ? params[:var_type] + name : name, type).eval(binding)
+
+	unless suppress_label.blank?
+	  node.suppress_label = true
+	end
 
 	if label.elements
 	  node.label = label.term.text_value

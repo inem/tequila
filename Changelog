@@ -1,0 +1,7 @@
+2009-09-07 Eugene Hlyzov  <hlyzov@gmail.com>
+	[feature] Add ability to suppress labels
+	minor refactoring
+2009-09-06 Eugene Hlyzov  <hlyzov@gmail.com>
+	fix bug with nil association
+	fix bug with wrong label
+	add tests for fixed bugs
