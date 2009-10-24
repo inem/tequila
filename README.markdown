@@ -21,7 +21,7 @@ Today while developing web applications with rich user UI, almost everything you
 
 Tequila is an instrument, which lets easily move your JSON-generation logic from controllers to views. Take a look at features:
 
-## Features/Example ##
+## Features ##
 
 ![Tequila features](http://inem.github.com/images/tequila-features.png)
 
