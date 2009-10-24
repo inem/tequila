@@ -1,12 +1,10 @@
-## [Tequila](http://inem.github.com/tequila.html) ##
-
 ## Overview ##
 
 Tequila basically is HAML for JSON generation.
 
 Today while developing web applications with rich user UI, almost everything you need from rails backend is bunch of data in JSON format.
 
-- Almost always, when you had to create unobvious set of data, your controllers became fat and ugly. Looks familiar?  
+- Almost always, when you had to create unobvious set of data, your controllers became fat and ugly.
 
         @humans.to_json(
           :methods => [:login, :enhanced_name, :hello_world], :except => [:created_at, :updated_at],
@@ -17,13 +15,13 @@ Today while developing web applications with rich user UI, almost everything you
           )
 
 - And you had to create a lot of small helper methods in your models if you want for example fullname instead of firstname, middlename and lastname or you want pretty address, instead of separate fields for zip, country, state and street adress in your JSON.
-- Ah, and you had to create child node in your JSON for has-one or belongs-to associations if you want to get even one attribute form association.
+- And you had to create child node in your JSON for has-one or belongs-to associations if you want to get even one attribute form association.
 - You cannot rename keys in your json. You might want to use keyword "type", but it is reserved by rails.
 - What about calling your method with some parameters while generating JSON? No native way, sorry...
 
-No way out? [Tequila is the salvation!](http://inem.github.com/tequila.html)
+Tequila is an instrument, which lets easily move your JSON-generation logic from controllers to views. Take a look at features:
 
-## Features ##
+## Features/Example ##
 
 ![Tequila features](http://inem.github.com/images/tequila-features.png)
 
@@ -36,12 +34,7 @@ No way out? [Tequila is the salvation!](http://inem.github.com/tequila.html)
 
 After that drop some Tequila code into an apropriate template (should have .jazz extension) - and you are there!
 
-## Sandbox ##
-
-Here are some prooflinks, where you can see, how JSON output differs for different jazz templates.  
-Don't forget to turn on you firebug/safari console
-
-First example
+## Examples ##
 
     -@humans => people
       :only
@@ -61,8 +54,6 @@ First example
           :only
             .class_name
 
-Second example
-
     -@humans => aa
       :except
         .name
@@ -78,8 +69,6 @@ Second example
         +pet_type
           :only
             .class_name
-
-Third example
 
     -@humans => humanoids
       :only
@@ -172,8 +161,6 @@ Strict order of definitions required! All blocks are optional.
 3. :code blocks
 4. +asscociations
 5. &lt;gluening
-
-## Development ##
 
 ### Benchmarks ###
 
