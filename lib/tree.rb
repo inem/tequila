@@ -78,6 +78,7 @@ module Tequila
     attr_accessor :code_blocks
     attr_accessor :label
     attr_accessor :suppress_label
+    attr_accessor :statics
     attr_reader :name
     attr_reader :content
     attr_reader :type
@@ -105,13 +106,26 @@ module Tequila
         @name = name
         @label = name
         @params = []
-        self
       end
 
       def to_s
         name +
         (params.empty? ? '' : "(#{params * ','})") +
         (name == label ? '' : " => #{label}")
+      end
+    end
+
+    class Static
+      attr_accessor :label
+      attr_accessor :value
+
+      def initialize label, value
+        @label = label
+        @value = value
+      end
+
+      def to_s
+        "#{label}: #{value}"
       end
     end
 
@@ -122,7 +136,6 @@ module Tequila
       def initialize(name)
         @name = name
         @label = name
-        self
       end
 
       def to_s
@@ -143,6 +156,7 @@ module Tequila
       @methods = []
       @attributes = { :only => [], :except => []}
       @code_blocks = []
+      @statics = []
       @suppress_label = false
     end
 
@@ -165,8 +179,8 @@ module Tequila
       elsif attributes[:except].size > 0
         context.attributes.delete_if {|(k,v)| attributes[:except].map(&:name).include?(k)}
       else
-        # use all variables by default
-        context.attributes
+        # use all variables by default if they are supported
+        context.respond_to?(:attributes) ? context.attributes : {}
       end.merge(
         (methods || []).inject({}) do |res, m|
           res[m.label] = context.send(m.name.intern, *(m.params.map {|p| context.instance_eval p}))
@@ -175,6 +189,11 @@ module Tequila
       ).merge(
         code_blocks.inject({}) do |res, cb|
           res[cb.label] = context.instance_eval cb.code
+          res
+        end
+      ).merge(
+        statics.inject({}) do |res, s|
+          res[s.label] = s.value
           res
         end
       )

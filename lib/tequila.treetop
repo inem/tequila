@@ -18,7 +18,7 @@ grammar Tequila
   end
 
   rule object
-    term suppress_label:'~'? label:( space '=>' space term)? atd:attributes_decl? mtd:methods_decl? cbd:code_decl* asd:association_decl* gld:gluing_decl* eob {
+    term suppress_label:'~'? label:( space '=>' space term)? atd:attributes_decl? mtd:methods_decl? std:statics_decl? cbd:code_decl* asd:association_decl* gld:gluing_decl* eob {
 
       def name
         elements[0].text_value
@@ -28,7 +28,7 @@ grammar Tequila
 
 	node = Tequila::Node.new((:variable == type) ? params[:var_type] + name : name, type).eval(binding)
 
-	unless suppress_label.blank?
+	unless suppress_label.empty?
 	  node.suppress_label = true
 	end
 
@@ -38,6 +38,10 @@ grammar Tequila
 
 	if atd.elements
           atd.update_node(node)
+	end
+
+	if std.elements
+	  std.update_node(node)
 	end
 
 	if mtd.elements
@@ -158,6 +162,22 @@ grammar Tequila
         [params.first_param.text_value] + params.rest_params.elements.map{|p| p.param.text_value}
       end
 
+    }
+  end
+
+  rule statics_decl
+    space ':static' std:(static_decl)+ {
+      def update_node(node)
+        std.elements.each {|x| x.update_node(node)}
+      end
+    }
+  end
+
+  rule static_decl
+    space label:term space '=>' space stv:term {
+      def update_node(node)
+        node.statics += [Tequila::Node::Static.new(label.text_value, stv.text_value)]
+      end
     }
   end
 
