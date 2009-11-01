@@ -30,7 +30,7 @@ Tequila is an instrument, which lets easily move your JSON-generation logic from
 
 ## Installation ##
 
-./script/plugin git://github.com/inem/tequila.git
+./script/plugin install git://github.com/inem/tequila.git
 
 After that drop some Tequila code into an apropriate template (should have .jazz extension) - and you are there!
 
