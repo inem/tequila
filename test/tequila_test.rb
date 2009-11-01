@@ -10,7 +10,9 @@ class TestTequila < Test::Unit::TestCase
     parser = TequilaParser.new
     eval(init)
     jazz = TequilaPreprocessor.run(jazz)
-    json2 = parser.parse(jazz).eval(binding).build_hash
+    parsed_template = parser.parse(jazz)
+    evaluated_template = parsed_template.eval(binding)
+    json2 = evaluated_template.build_hash
     return json2 if explicit
     assert_json_equal(json, json2.to_json, name)
   end
@@ -267,5 +269,15 @@ END
     run_test jazz, json
   end
 
+
+  def test_static_values
+    jazz = <<END
+-obj
+  :static
+    name => static_field
+END
+    json = '{ "obj" : {"name" : "static_field"}}'
+    run_test jazz, json, "obj = Object.new"
+  end
 
 end

@@ -1,3 +1,5 @@
+2009-11-01 Eugene Hlyzov  <hlyzov@gmail.com>
+        [feature] Add ability to specify static values    
 2009-09-07 Eugene Hlyzov  <hlyzov@gmail.com>
 	[feature] Add ability to suppress labels
 	minor refactoring
