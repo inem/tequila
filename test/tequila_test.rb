@@ -4,8 +4,13 @@ require 'json'
 
 require File.dirname(__FILE__) + '/../lib/preprocessor'
 
+class Tequila::Config::Default
+  show_initial_label!
+end
+
 class TestTequila < Test::Unit::TestCase
   DIR = "data/"
+
   def run_test(jazz, json, init = 'humans = Human.all :order => "name"', explicit = false)
     parser = TequilaParser.new
     eval(init)
@@ -278,6 +283,18 @@ END
 END
     json = '{ "obj" : {"name" : "static_field"}}'
     run_test jazz, json, "obj = Object.new"
+  end
+
+  def test_headers
+    jazz = <<END
+#!hide_initial_label!
+-humans~
+  :only
+    .name
+END
+    json = '[ {"name":"Alex"} ,{"name":"Eugene"}, {"name":"Ivan"}, {"name":"Oleg"} ]'
+    run_test jazz, json
+
   end
 
 end

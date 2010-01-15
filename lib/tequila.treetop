@@ -1,10 +1,23 @@
 grammar Tequila
 
   rule program
-    space expression space {
+    space configuration:configuration_line* expression space {
       def eval(binding)
         tree = Tequila::Tree.new
+	configuration.elements.each {|cl| cl.eval(tree)}
 	expression.eval(tree, tree.root, binding)
+      end
+    }
+  end
+
+  rule configuration_line
+    space '#!' key:term space value:term? {
+      def eval(tree)
+        if value.text_value.blank?
+          tree.config.send(key.text_value.intern)
+	else
+	  tree.config.send(key.text_value.intern, value.text_value)
+	end
       end
     }
   end

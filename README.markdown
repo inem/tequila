@@ -94,7 +94,7 @@ Have you ever used to_json method in your Rails app? If so, you should be famili
 
     :include => { :association1 => {...}}
 
-You should just remember that every variable definition must be started '-' and every association with '+'.     
+You should just remember that every variable definition must be started '-' and every association with '+'.
 So example above can be written much shortly:
 
     +association1
@@ -152,6 +152,33 @@ Generated json fragment looks like too comprehensive. Let us rewrite this fragme
 
 Of course it can be handled via additional model methods, but latter is mere artifical solution. We are going to DRY, aren't we?
 
+### Configuration ###
+
+Since 0.1.3 there are ability to configure initial label rendering. Configuration options can be inserted either globally via Tequila::Config::Default class or locally with following syntax:
+
+    #!some_configure_option
+    USUAL_TEQUILA_CODE_HERE
+
+there are two available options:
+1. hide_initial_label!
+2. show_initial_label!
+
+It has a sense in a case when you are rendering collection of
+objects and don't want to output its label. Compare:
+
+    # show_initial_label! used
+    {"links" => [{"link" => {..}}, {"link => {..}}]}
+vs
+    # hide_initial_label! used
+    [{"link" => {..}}, {"link => {..}}]
+
+As we are going to be fully compatible with Rails, hide_initial_label! is default option now.
+To cancel it you can just add following lines somewhere in initializers:
+
+    class Tequila::Config::Default
+      show_initial_label!
+    end
+
 ## Issues ##
 
 Strict order of definitions required! All blocks are optional.
@@ -164,14 +191,14 @@ Strict order of definitions required! All blocks are optional.
 
 ### Benchmarks ###
 
-    
+
 
                         user        system      total       real
     to_json             7.280000    0.440000    7.720000    (  7.811976)
     jazz                25.920000   1.840000    27.760000   ( 28.229717)
     jazz with preparse  17.210000   1.580000    18.790000   ( 19.122837)
 
-At least for these tests it looks like to_json is ~2.4x faster..  
+At least for these tests it looks like to_json is ~2.4x faster..
 But for some reason you use Ruby instead of C, right? Despite of the fact that Tequila is not too fast today we are happy to have such instrument and are going to develop it further. And we have good plans about it...
 
 ### Plans ###

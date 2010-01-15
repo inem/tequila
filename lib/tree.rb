@@ -2,13 +2,49 @@ require 'ostruct'
 
 module Tequila
 
+  class Config
+
+    class Default
+      @@show_initial_label = false
+
+      def self.show_initial_label!
+        @@show_initial_label = true
+      end
+
+      def self.hide_initial_label!
+        @@show_initial_label = false
+      end
+
+      def self.show_initial_label?
+        @@show_initial_label
+      end
+    end
+
+    attr_reader :show_initial_label
+
+    def show_initial_label!
+      @show_initial_label = true
+    end
+
+    def hide_initial_label!
+      @show_initial_label = false
+    end
+
+    def initialize
+      @show_initial_label = Default.show_initial_label?
+    end
+
+  end
+
   class Tree
 
     attr_reader :root
+    attr_accessor :config
 
     def initialize
       @root = OpenStruct.new({:name => :root})
       @tree = { @root => [] }
+      @config = Tequila::Config.new
     end
 
     def add_child_to(branch, child)
@@ -25,9 +61,11 @@ module Tequila
     end
 
     def build_hash
-      @tree[root].inject({}) do |out, n|
+      res = @tree[root].inject({}) do |out, n|
         out.merge(build_hash_with_context(n, n.content.call))
       end
+      ((res.values.first.kind_of? Array) && !config.show_initial_label) ?
+      res.values.first : res
     end
 
     def build_hash_with_context(node, context)
