@@ -121,6 +121,13 @@ module Tequila
     attr_reader :content
     attr_reader :type
 
+    # it is used for attributes if 'all' keyword was specified
+    attr_reader :pick_all
+    attr_reader :drop_all
+
+    class ImpreciseAttributesDeclarationError < StandardError; end
+    class NoAttributeError < StandardError; end
+
     class CodeBlock
       attr_reader :label
       attr_reader :code
@@ -209,16 +216,41 @@ module Tequila
     end
 
     def apply(context)
-      if attributes[:only].size > 0
-        attributes[:only].inject({}) do |res, att|
-          res[att.label] = context.send(att.name.intern)
-          res
+      mapping = {}
+      if context.respond_to?(:attributes) && !drop_all
+
+        if (pick_all || drop_all)
+          unless attributes[:only].empty? && attributes[:except].empty?
+            raise ImpreciseAttributesDeclarationError, "declaration conflict"
+          end
         end
-      elsif attributes[:except].size > 0
-        context.attributes.delete_if {|(k,v)| attributes[:except].map(&:name).include?(k)}
+
+        context_attributes = context.attributes
+        #p "All: #{context_attributes.keys.inspect}"
+        if attributes[:only].size > 0
+          chosen_attributes = attributes[:only].map(&:name)
+          #p "Chosen: #{chosen_attributes}"
+          unless (foreign_attributes = (chosen_attributes.to_set - context_attributes.keys.to_set)).empty?
+            raise NoAttributeError, "can't find attributes: #{foreign_attributes.to_a.join(', ')}"
+          end
+          attributes[:only].inject({}) do |res, att|
+            res[att.label] = context_attributes[att.name]
+            res
+          end
+        elsif attributes[:except].size > 0
+
+          ignored_attributes = attributes[:except].map(&:name)
+          #p "Ignored: #{ignored_attributes.inspect}"
+          unless (foreign_attributes = (ignored_attributes.to_set - context_attributes.keys.to_set)).empty?
+            raise NoAttributeError, "can't find attributes: #{foreign_attributes.to_a.join(', ')}"
+          end
+          context_attributes.delete_if { |att_name, _| ignored_attributes.include?(att_name) }
+        else
+          # use all variables by default if they are supported
+          context_attributes
+        end
       else
-        # use all variables by default if they are supported
-        context.respond_to?(:attributes) ? context.attributes : {}
+        {}
       end.merge(
         (methods || []).inject({}) do |res, m|
           res[m.label] = context.send(m.name.intern, *(m.params.map {|p| context.instance_eval p}))
@@ -238,8 +270,25 @@ module Tequila
     end
 
     def add_attribute(key, attr)
+      raise ImpreciseAttributesDeclarationError if (pick_all || drop_all)
       unless @attributes[key].include?(attr)
         @attributes[key] << attr
+      end
+    end
+
+    def no_attributes!
+      if pick_all
+        raise ImpreciseAttributesDeclarationError, "declaration conflict"
+      else
+        @drop_all = true
+      end
+    end
+
+    def all_attributes!
+      if drop_all
+        raise ImpreciseAttributesDeclarationError, "declaration conflict"
+      else
+        @pick_all = true
       end
     end
 

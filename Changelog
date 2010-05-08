@@ -1,3 +1,12 @@
+2010-05-08 Eugene Hlyzov  <hlyzov@gmail.com>
+	allow space between '-' and variable declaration
+	meaningful aliases for control symbols
+	add ability to omit some control symbols
+	allow using ' symbol to stress a variable
+	add 'pick all' and 'drop all' instructions
+2010-01-15 Eugene Hlyzov  <hlyzov@gmail.com>
+	[feature] Add configuration options
+	please check README - there is a change in default behaviour
 2009-11-01 Eugene Hlyzov  <hlyzov@gmail.com>
         [feature] Add ability to specify static values
 2009-09-07 Eugene Hlyzov  <hlyzov@gmail.com>
@@ -7,6 +16,3 @@
 	fix bug with nil association
 	fix bug with wrong label
 	add tests for fixed bugs
-2010-01-15 Eugene Hlyzov  <hlyzov@gmail.com>
-	[feature] Add configuration options
-	please check README - there is a change in default behaviour

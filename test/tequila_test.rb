@@ -50,20 +50,7 @@ class TestTequila < Test::Unit::TestCase
       :only
         .class_name => pet_type
 END
-    json = '{ "eugene" :
-      { "name" : "Eugene",
-        "address" : "district3",
-        "where" : "I am from district3",
-        "pets" :
-        [ {"pet" :
-          { "name" : "Poiyo",
-            "which": "Poiyo is wet and cold",
-            "toys" :
-            [ { "toy" : { "label" : "LHC" } },
-              { "toy" : { "label" : "Humanity" } } ],
-            "pet_type" : "fish"}}
-        ]}}'
-    json2 = run_test jazz, json, 'eugene = Human.first', true
+    json2 = run_test jazz, nil, 'eugene = Human.first', true
     eugene = json2['eugene']
     pets = eugene['pets']
     pet = pets[0]['pet']
@@ -204,7 +191,7 @@ END
     run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
   end
 ####  include files ####
-  def test_include_file
+  def test_include_symbol
     jazz = <<END
 -human
   :only
@@ -223,6 +210,27 @@ end
 END
     assert_equal TequilaPreprocessor.run(jazz), jazz_for_treetop
   end
+
+  def test_include_keyword
+    jazz = <<END
+-human
+  :only
+    .name
+  include test/pets
+END
+    jazz_for_treetop = <<END
+-human
+  :only
+    .name
+  +pets
+    :only
+      .id
+end
+end
+END
+    assert_equal TequilaPreprocessor.run(jazz), jazz_for_treetop
+  end
+
 
   def test_label_building
     jazz =<<END
@@ -295,6 +303,90 @@ END
     json = '[ {"name":"Alex"} ,{"name":"Eugene"}, {"name":"Ivan"}, {"name":"Oleg"} ]'
     run_test jazz, json
 
+  end
+
+  def test_space_after_control_chars
+    jazz = <<END
+- ivan
+  :only
+    .name
+END
+    json = '{"ivan" :{ "name" : "Ivan" }}'
+    run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
+  end
+
+  def test_aliases
+    jazz = <<END
+source ivan
+  :except
+    .id
+    .address
+  join pets
+    :only
+      .name
+    merge pet_type
+      :only
+        .class_name => whois
+END
+    json = ' {
+      "ivan" :
+        { "name" : "Ivan",
+          "pets" : [
+          { "pet" :
+            { "name" : "Skooby Doo" ,
+              "whois" : "dog" }  } ] } }'
+    run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
+
+  end
+
+  def test_clean_syntax
+    jazz = <<END
+source 'ivan
+  except .id .address
+  join 'pets
+    only .name
+    merge 'pet_type
+      only .class_name label 'whois
+END
+    json = '{
+      "ivan" :
+        { "name" : "Ivan",
+          "pets" : [
+          { "pet" :
+            { "name" : "Skooby Doo" ,
+              "whois" : "dog" }  } ] } }'
+    run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
+
+  end
+
+  def test_drop_all_feature
+    jazz = <<END
+source ivan
+  drop all
+  join pets
+    pick .name
+END
+    json = '{
+      "ivan" :
+        { "pets" : [
+          { "pet" :
+            { "name" : "Skooby Doo" }  } ] } }'
+    run_test jazz, json, 'ivan = Human.find_by_name "Ivan"'
+
+  end
+
+  def test_pick_all_feature
+    jazz = "-ivan pick all"
+    hash = run_test jazz, nil, 'ivan = Human.find_by_name "Ivan"', true
+    ivan = Human.find_by_name "Ivan"
+    assert_equal ivan.attribute_names.sort, hash["ivan"].keys.sort
+  end
+
+  def test_pick_all_by_default
+    jazz = "-ivan"
+    hash = run_test jazz, nil, 'ivan = Human.find_by_name "Ivan"', true
+    ivan = Human.find_by_name "Ivan"
+    assert_equal ivan.attribute_names.sort, hash["ivan"].keys.sort
   end
 
 end

@@ -2,7 +2,7 @@ module TequilaPreprocessor
   EOB = "end\n".freeze
   EOC = "end\n".freeze
   JAZZ = ".jazz".freeze
-  
+
   def TequilaPreprocessor.run(source, offset = -1)
     source = replace(source)
     prev = offset
@@ -26,7 +26,7 @@ module TequilaPreprocessor
         case rest
         when /^:code/
           code = tabs
-        when /^(\+|\-|\<)/
+        when /^(\+|\-|\<|source|join|merge)/
           diff = prev - tabs
           diff += 1 if diff >= 0
           diff.times { text += EOB }
@@ -39,15 +39,15 @@ module TequilaPreprocessor
     (prev - offset).times { text += EOB }
     text
   end
-  
+
 private
   def TequilaPreprocessor.replace(source)
     text = ''
-    while (i = (/(^ *)&(.*$)/ =~ source)) do
+    while (i = (/(^ *)(&|include(\ )+)(.*$)/ =~ source)) do
       text += source[0...i]
       source = $'
       spaces = $1.size
-      filename = $2 + ".jazz"
+      filename = $4 + ".jazz"
       text += include_file(filename, spaces)
     end
     text += source
@@ -63,7 +63,7 @@ private
     f.close
     lines
   end
-  
+
   def TequilaPreprocessor.spaces(line)
     (/^ +/ =~ line) ? [$&.size, $'] : [0, line]
   end
