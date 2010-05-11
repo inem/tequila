@@ -24,7 +24,12 @@ end
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
-    # omitted for brevity
+    gemspec.name = "Tequila"
+    gemspec.summary = "Language for advanced JSON generation"
+    gemspec.description = "Language for advanced JSON generation"
+    gemspec.email = "eugene.hlyzov@gmail.com"
+    gemspec.homepage = "http://github.com/inem/tequila"
+    gemspec.authors = ["Eugene Hlyzov", "Ivan Nemytchenko"]
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
