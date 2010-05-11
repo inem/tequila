@@ -20,3 +20,13 @@ desc 'Benchmark'
 task :bench do
   TequilaBenchmark.run
 end
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |gemspec|
+    # omitted for brevity
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
+end
