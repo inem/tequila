@@ -24,6 +24,7 @@ end
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
+    gemspec.version = '0.2.0'
     gemspec.name = "Tequila"
     gemspec.summary = "Language for advanced JSON generation"
     gemspec.description = "Language for advanced JSON generation"
