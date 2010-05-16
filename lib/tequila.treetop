@@ -255,7 +255,7 @@ grammar Tequila
   end
 
   rule white_space
-    [ \n]
+    [ \n\r]
   end
 
   rule data_mark
