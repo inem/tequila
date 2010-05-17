@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 require 'treetop'
-require 'tequila'
+require 'tequila_grammar'
 require 'preprocessor'
 require 'tree'
 
