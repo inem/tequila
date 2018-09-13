@@ -14,7 +14,7 @@ Today while developing web applications with rich user UI, almost everything you
             }}
           )
 
-- And you had to create a lot of small helper methods in your models if you want for example fullname instead of firstname, middlename and lastname or you want pretty address, instead of separate fields for zip, country, state and street adress in your JSON.
+- And you had to create a lot of small helper methods in your models if you want for example fullname instead of firstname, middlename and lastname or you want pretty address, instead of separate fields for zip, country, state and street address in your JSON.
 - And you had to create child node in your JSON for has-one or belongs-to associations if you want to get even one attribute form association.
 - You cannot rename keys in your json. You might want to use keyword "type", but it is reserved by rails.
 - What about calling your method with some parameters while generating JSON? No native way, sorry...
@@ -32,7 +32,7 @@ Tequila is an instrument, which lets easily move your JSON-generation logic from
 
 ./script/plugin install git://github.com/inem/tequila.git
 
-After that drop some Tequila code into an apropriate template (should have .jazz extension) - and you are there!
+After that drop some Tequila code into an appropriate template (should have .jazz extension) - and you are there!
 
 ## Examples ##
 
@@ -103,7 +103,7 @@ So example above can be written much shortly:
 
 ### Labels ###
 
-Label can be defined via expression (=> label) which can be added everywhere where it makes sense. It means that you can add label to such elements as :code, +association, etc.. and can not add label to :except declaration and :gluening object. Some functionality of these features are covered by standart Rails to_json method and some aren't. For instance, if you bind alias 'animals' to assoication 'pets' it will automatically leads to bound 'animal' label to each Pet model below such declaration (see [example](http://gist.github.com/173255/))
+Label can be defined via expression (=> label) which can be added everywhere where it makes sense. It means that you can add label to such elements as :code, +association, etc.. and can not add label to :except declaration and :gluening object. Some functionality of these features are covered by standard Rails to_json method and some aren't. For instance, if you bind alias 'animals' to association 'pets' it will automatically leads to bound 'animal' label to each Pet model below such declaration (see [example](http://gist.github.com/173255/))
 
 ### Call methods with params ###
 
@@ -150,7 +150,7 @@ Generated json fragment looks like too comprehensive. Let us rewrite this fragme
     end
     # Out:  {'tag' => {'label' => 'Happy Christmas!', 'tagger_name' => 'Mr Lawrence"}}
 
-Of course it can be handled via additional model methods, but latter is mere artifical solution. We are going to DRY, aren't we?
+Of course it can be handled via additional model methods, but latter is mere artificial solution. We are going to DRY, aren't we?
 
 ### Configuration ###
 
@@ -186,7 +186,7 @@ Strict order of definitions required! All blocks are optional.
 1. :only or :except
 2. :methods
 3. :code blocks
-4. +asscociations
+4. +associations
 5. &lt;gluening
 
 ### Benchmarks ###
